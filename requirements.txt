@@ -3,4 +3,9 @@ Flask==0.12.2
 itsdangerous==0.24
 Jinja2==2.10
 MarkupSafe==1.0
+psycopg2==2.7.4
+pyTelegramBotAPI==3.5.2
+requests==2.7.0
+six==1.11.0
+SQLAlchemy==1.2.4
 Werkzeug==0.14.1
