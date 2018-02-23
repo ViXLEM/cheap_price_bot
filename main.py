@@ -1,15 +1,12 @@
 import telebot
 import os
-import sqlalchemy
 
 from flask import Flask, request
-from models import Base, User
-from config import TOKEN, ADMIN_CHAT_ID, DATABASE_URL, APP_URL
+from models import User, Session, Product, NovusProduct, AuchanProduct, MMProduct
+from config import TOKEN, ADMIN_CHAT_ID, APP_URL
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
-engine = sqlalchemy.create_engine(DATABASE_URL, echo=True)
-Session = sqlalchemy.orm.sessionmaker(bind=engine)
 
 
 @app.route('/{}'.format(TOKEN), methods=['POST'])
@@ -40,6 +37,7 @@ def send_mess_to_admin(text='check_mess_to_ADMIN'):
 @app.route("/send_check")
 def check_message():
     """Send check message to admin after click url."""
+
     send_mess_to_admin()
     return 'Sended succsessful!'
 
@@ -81,11 +79,28 @@ def get_users_id(message):
 
 
 @bot.message_handler(commands=['barcode'])
-def main(message):
-    text = 'thomething text'
-    markup = telebot.types.ReplyKeyboardMarkup()
-    markup.row('/barcode', '/thomethingelse')
-    bot.send_message(message.chat.id, text, reply_markup=markup)
+def check_by_barcode(message):
+    barcode = message.text.split()[1]
+
+    session = Session()
+    product = session.query(Product).filter_by(barcode=barcode).first()
+    product_info = ''
+    if product:
+        product_info += '{}\n\n'.format(product.name)
+        if product.barcode_auchan:
+            price = session.query(MMProduct).filter_by(barcode=barcode).first().price
+            product_info += '\nAUCHAN: {}\n'.format(price)
+        if product.barcode_mm:
+            price = session.query(AuchanProduct).filter_by(barcode=barcode).first().price
+            product_info += 'MegaMarket: {}\n'.format(price)
+        if product.barcode_novus:
+            price = session.query(NovusProduct).filter_by(barcode=barcode).first().price
+            product_info += 'NOVUS: {}\n'.format(price)
+        bot.send_message(message.chat.id, product_info)
+    else:
+        bot.send_message(message.chat.id, 'This product was not found in our DB '
+                                          'or was send wrong barcode')
+    session.close()
 
 
 @bot.message_handler(content_types=['text'])
@@ -94,7 +109,6 @@ def resend_message(message):
 
 
 if __name__ == '__main__':
-    Base.metadata.create_all(engine)
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
     # bot.remove_webhook()
