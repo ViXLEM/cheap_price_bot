@@ -92,10 +92,10 @@ def check_by_barcode(message):
     if product:
         product_info += '{}\n\n'.format(product.name)
         if product.barcode_auchan:
-            price = session.query(MMProduct).filter_by(barcode=barcode).first().price
+            price = session.query(AuchanProduct).filter_by(barcode=barcode).first().price
             product_info += '\nAUCHAN: {}\n'.format(price)
         if product.barcode_mm:
-            price = session.query(AuchanProduct).filter_by(barcode=barcode).first().price
+            price = session.query(MMProduct).filter_by(barcode=barcode).first().price
             product_info += 'MegaMarket: {}\n'.format(price)
         if product.barcode_novus:
             price = session.query(NovusProduct).filter_by(barcode=barcode).first().price
