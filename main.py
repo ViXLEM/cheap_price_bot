@@ -63,9 +63,9 @@ def start(message):
     session.add(user)
     session.commit()
     session.close()
-    bot.send_message(message.chat.id, "You are registered successful!"
+    bot.send_message(message.chat.id, "You are registered successful! "
                                       "Send /barcode that get informations "
-                                      "about buhlo product")
+                                      "about alcohol product")
 
 
 @bot.message_handler(commands=['get_users_id'])
@@ -80,6 +80,10 @@ def get_users_id(message):
 
 @bot.message_handler(commands=['barcode'])
 def check_by_barcode(message):
+    if len(message.text) == 8:
+        bot.send_message(message.chat.id, 'Please, enter barcode\n'
+                                          'For example:\n/barcode 4820000455848')
+        return 'error'
     barcode = message.text.split()[1]
 
     session = Session()
@@ -98,14 +102,23 @@ def check_by_barcode(message):
             product_info += 'NOVUS: {}\n'.format(price)
         bot.send_message(message.chat.id, product_info)
     else:
-        bot.send_message(message.chat.id, 'This product was not found in our DB '
-                                          'or was send wrong barcode')
+        bot.send_message(message.chat.id, 'This product was not found in our DB. '
+                                          'Maybe you send wrong barcode?')
     session.close()
 
 
+@bot.message_handler(commands=['help'])
+def help(message):
+    text = 'Commands:\n' \
+           '/barcode ************* - get product price by barcode\n' \
+           '/start - start using this bot'
+    bot.send_message(message.chat.id, text)
+
+
 @bot.message_handler(content_types=['text'])
-def resend_message(message):
-    bot.send_message(message.chat.id, message.text)
+def unrecognized_command(message):
+    bot.send_message(message.chat.id, 'Unrecognized command\n'
+                                      'Use /help to get list of commands')
 
 
 if __name__ == '__main__':
