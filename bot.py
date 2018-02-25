@@ -9,7 +9,7 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    """Register new user to db."""
+    """Start use bot and register new user to db."""
 
     session = Session()
     u = session.query(User).filter_by(chat_id=message.chat.id).first()
@@ -26,6 +26,8 @@ def start(message):
 
 @bot.message_handler(commands=['get_users_id'])
 def get_users_id(message):
+    """Send message with table id's registered users."""
+
     session = Session()
     text = ''
     for u in session.query(User).all():
@@ -35,7 +37,9 @@ def get_users_id(message):
 
 
 @bot.message_handler(commands=['barcode'])
-def check_by_barcode(message):
+def search_by_barcode(message):
+    """Search barcode in db and send message with product price."""
+
     if len(message.text) == 8:
         bot.send_message(message.chat.id, 'Please, enter barcode\n'
                                           'For example:\n/barcode 4820000455848')
@@ -65,6 +69,8 @@ def check_by_barcode(message):
 
 @bot.message_handler(commands=['help'])
 def help(message):
+    """Send help message with list of commands."""
+
     text = 'Commands:\n' \
            '/barcode ************* - get product price by barcode\n' \
            '/start - start using this bot'
@@ -73,5 +79,7 @@ def help(message):
 
 @bot.message_handler(content_types=['text'])
 def unrecognized_command(message):
+    """Send message if command was unrecognized."""
+
     bot.send_message(message.chat.id, 'Unrecognized command\n'
                                       'Use /help to get list of commands')
