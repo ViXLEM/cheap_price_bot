@@ -3,7 +3,8 @@ import os
 
 from flask import Flask, request
 from models import User, Session, Product, NovusProduct, AuchanProduct, MMProduct
-from config import TOKEN, ADMIN_CHAT_ID, APP_URL
+from config import TOKEN, APP_URL
+from tools import send_mess_to_admin
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
@@ -27,11 +28,6 @@ def webhook():
     bot.set_webhook(url="{}{}".format(APP_URL, TOKEN))
     return "Succsess! Webhook is thrown"
 
-
-def send_mess_to_admin(text='check_mess_to_ADMIN'):
-    """Send message to administrator."""
-
-    bot.send_message(ADMIN_CHAT_ID, text)
 
 
 @app.route("/send_check")
