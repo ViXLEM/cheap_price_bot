@@ -1,4 +1,4 @@
-from main import bot
+from bot import bot
 from config import ADMIN_CHAT_ID
 
 
