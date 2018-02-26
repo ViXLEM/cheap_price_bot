@@ -88,6 +88,8 @@ def unrecognized_command(message):
 
 @bot.message_handler(content_types=['photo'])
 def get_product_from_photo(message):
+    """Send mess with barcode from photo."""
+
     file_id = message.photo[-1].file_id
     file_path = bot.get_file(file_id).file_path
     photo_url = 'https://api.telegram.org/file/bot{token}/{path}'.format(
