@@ -4,7 +4,10 @@ from config import TOKEN
 from models import User, Session, Product, NovusProduct, AuchanProduct, MMProduct
 
 
+
+
 bot = telebot.TeleBot(TOKEN)
+from utils import get_barcode_from_photo
 
 
 @bot.message_handler(commands=['start'])
@@ -83,3 +86,14 @@ def unrecognized_command(message):
 
     bot.send_message(message.chat.id, 'Unrecognized command\n'
                                       'Use /help to get list of commands')
+
+
+@bot.message_handler(content_types=['photo'])
+def get_photo(message):
+    file_id = message.photo[-1].file_id
+    file_path = bot.get_file(file_id).file_path
+    photo_url = 'https://api.telegram.org/file/bot{token}/{path}'.format(
+                token=TOKEN, path=file_path)
+
+    barcode = get_barcode_from_photo(photo_url)
+    bot.send_message(message.chat.id, barcode)
