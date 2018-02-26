@@ -4,8 +4,6 @@ from config import TOKEN
 from models import User, Session, Product, NovusProduct, AuchanProduct, MMProduct
 
 
-
-
 bot = telebot.TeleBot(TOKEN)
 from utils import get_barcode_from_photo
 
