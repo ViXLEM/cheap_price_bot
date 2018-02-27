@@ -10,4 +10,3 @@ six==1.11.0
 SQLAlchemy==1.2.4
 Werkzeug==0.14.1
 Pillow==5.0.0
-pyzbar==0.1.4
