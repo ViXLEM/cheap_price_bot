@@ -14,11 +14,19 @@ def send_mess_to_admin(text='check_mess_to_ADMIN'):
 
 
 def get_barcode_from_photo(url):
+    """Separate barcode from picture.
+
+    Args:
+    url (str): Photo url.
+
+    Returns:
+    str: Barcode value if was found, None otherwise.
+    """
 
     response = requests.get(url)
     photo = Image.open(BytesIO(response.content))
     decoded_data = decode(image=photo, symbols=[ZBarSymbol.EAN13])
-    if len(decoded_data) < 1:
+    if len(decoded_data) > 1:
         barcode = decoded_data[0].data.decode("utf-8")
     else:
         barcode = None
