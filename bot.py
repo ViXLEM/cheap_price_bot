@@ -96,4 +96,8 @@ def get_product_from_photo(message):
                 token=TOKEN, path=file_path)
 
     barcode = get_barcode_from_photo(photo_url)
-    bot.send_message(message.chat.id, barcode)
+    if barcode:
+        bot.send_message(message.chat.id, barcode)
+    else:
+        bot.send_message(message.chat.id, '404\nBarcode was not found :)\n'
+                                          'Please take new photo and send again')
