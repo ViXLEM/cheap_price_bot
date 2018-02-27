@@ -5,12 +5,35 @@ from config import ADMIN_CHAT_ID
 from pyzbar.pyzbar import decode, ZBarSymbol
 from PIL import Image
 from io import BytesIO
+from models import Session, Product, NovusProduct, AuchanProduct, MMProduct
 
 
 def send_mess_to_admin(text='check_mess_to_ADMIN'):
     """Send message to administrator."""
 
     bot.send_message(ADMIN_CHAT_ID, text)
+
+
+def search_in_db(barcode):
+    session = Session()
+    product = session.query(Product).filter_by(barcode=barcode).first()
+    response_message = ''
+    if product:
+        response_message += '{}\n'.format(product.name)
+        if product.barcode_auchan:
+            price = session.query(AuchanProduct).filter_by(barcode=barcode).first().price
+            response_message += '\nAUCHAN: {}\n'.format(price)
+        if product.barcode_mm:
+            price = session.query(MMProduct).filter_by(barcode=barcode).first().price
+            response_message += 'MegaMarket: {}\n'.format(price)
+        if product.barcode_novus:
+            price = session.query(NovusProduct).filter_by(barcode=barcode).first().price
+            response_message += 'NOVUS: {}\n'.format(price)
+        response_message += '\nBarcode: {}'.format(barcode)
+    else:
+        response_message = 'This product was not found in our DB. Maybe you send wrong barcode?'
+    session.close()
+    return response_message
 
 
 def get_barcode_from_photo(url):
@@ -26,7 +49,7 @@ def get_barcode_from_photo(url):
     response = requests.get(url)
     photo = Image.open(BytesIO(response.content))
     decoded_data = decode(image=photo, symbols=[ZBarSymbol.EAN13])
-    if len(decoded_data) > 1:
+    if decoded_data:
         barcode = decoded_data[0].data.decode("utf-8")
     else:
         barcode = None

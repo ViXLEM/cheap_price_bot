@@ -1,11 +1,10 @@
 import telebot
 
 from config import TOKEN
-from models import User, Session, Product, NovusProduct, AuchanProduct, MMProduct
-
+from models import User, Session
 
 bot = telebot.TeleBot(TOKEN)
-from utils import get_barcode_from_photo
+from utils import get_barcode_from_photo, search_in_db
 
 
 @bot.message_handler(commands=['start'])
@@ -47,25 +46,8 @@ def search_by_barcode(message):
         return 'error'
     barcode = message.text.split()[1]
 
-    session = Session()
-    product = session.query(Product).filter_by(barcode=barcode).first()
-    product_info = ''
-    if product:
-        product_info += '{}\n\n'.format(product.name)
-        if product.barcode_auchan:
-            price = session.query(AuchanProduct).filter_by(barcode=barcode).first().price
-            product_info += '\nAUCHAN: {}\n'.format(price)
-        if product.barcode_mm:
-            price = session.query(MMProduct).filter_by(barcode=barcode).first().price
-            product_info += 'MegaMarket: {}\n'.format(price)
-        if product.barcode_novus:
-            price = session.query(NovusProduct).filter_by(barcode=barcode).first().price
-            product_info += 'NOVUS: {}\n'.format(price)
-        bot.send_message(message.chat.id, product_info)
-    else:
-        bot.send_message(message.chat.id, 'This product was not found in our DB. '
-                                          'Maybe you send wrong barcode?')
-    session.close()
+    response_message = search_in_db(barcode)
+    bot.send_message(message.chat.id, response_message)
 
 
 @bot.message_handler(commands=['help'])
@@ -97,7 +79,8 @@ def get_product_from_photo(message):
 
     barcode = get_barcode_from_photo(photo_url)
     if barcode:
-        bot.send_message(message.chat.id, barcode)
+        response_message = search_in_db(barcode)
     else:
-        bot.send_message(message.chat.id, '404\nBarcode was not found :)\n'
-                                          'Please take new photo and send again')
+        response_message = '404\nBarcode was not found :)\nPlease take '\
+                           'new photo and send again'
+    bot.send_message(message.chat.id, response_message)
