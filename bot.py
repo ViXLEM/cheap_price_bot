@@ -4,6 +4,7 @@ from config import TOKEN
 from models import User, Session
 
 bot = telebot.TeleBot(TOKEN)
+
 from utils import get_barcode_from_photo, search_in_db
 
 
@@ -51,7 +52,7 @@ def search_by_barcode(message):
 
 
 @bot.message_handler(commands=['help'])
-def help(message):
+def help_command(message):
     """Send help message with list of commands."""
 
     text = 'Commands:\n' \
@@ -69,8 +70,8 @@ def unrecognized_command(message):
 
 
 @bot.message_handler(content_types=['photo'])
-def get_product_from_photo(message):
-    """Send mess with barcode from photo"""
+def get_by_photo(message):
+    """Send mess with barcode from photo."""
 
     file_id = message.photo[-1].file_id
     file_path = bot.get_file(file_id).file_path

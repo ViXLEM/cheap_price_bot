@@ -27,7 +27,6 @@ def webhook():
     return "Succsess! Webhook is thrown"
 
 
-
 @app.route("/send_check")
 def check_message():
     """Send check message to admin after click url."""

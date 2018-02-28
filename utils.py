@@ -9,12 +9,25 @@ from models import Session, Product, NovusProduct, AuchanProduct, MMProduct
 
 
 def send_mess_to_admin(text='check_mess_to_ADMIN'):
-    """Send message to administrator."""
+    """Send message to administrator.
+
+    Args:
+    text (str): String line which will be send to admin.
+    """
 
     bot.send_message(ADMIN_CHAT_ID, text)
 
 
 def search_in_db(barcode):
+    """Search product in main db by barcode and return product data.
+
+    Args:
+    barcode (str): Product's barcode which need search.
+
+    Returns:
+    str: Product data if product was search. Standart responsee if wasn't search
+    """
+
     session = Session()
     product = session.query(Product).filter_by(barcode=barcode).first()
     response_message = ''
